@@ -1,3 +1,7 @@
-const { getESLintConfig } = require('@applint/spec');
+const {getESLintConfig} = require('@applint/spec');
 
-module.exports = getESLintConfig('react-ts');
+module.exports = getESLintConfig('react-ts', {
+    rules: {
+        'id-length': 'off'
+    }
+});

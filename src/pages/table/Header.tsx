@@ -1,65 +1,16 @@
 import { Button, Menu, MenuItem, styled } from '@mui/material';
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import { grey } from '@mui/material/colors';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Resizable } from 're-resizable';
-import { Fragment, useRef, useState } from 'react';
-
-const Cell = styled('div')<HCellProps>((props) => ({
-  textAlign: 'left',
-  height: 38,
-  display: 'flex',
-  padding: '0 8px',
-  alignItems: 'center',
-  fontSize: 12,
-  borderRight: props.isLastCell ? 'none' : '1px solid',
-  borderTop: '1px solid',
-  borderColor: grey[300],
-}));
-
-interface HCellProps {
-  children?: ReactNode;
-  width?: number;
-  isLastCell?: boolean;
-  onWidthChange?: (val: number) => void;
-}
-
-const HCell: FC<HCellProps> = ({
-  width,
-  children,
-  isLastCell,
-  onWidthChange,
-}) => {
-  return (
-    <Cell sx={{ width }} isLastCell={isLastCell}>
-      {children}
-    </Cell>
-  );
-  // return (
-  //   <Resizable
-  //     defaultSize={{ width: `${width}px`, height: '38px' }}
-  //     enable={{
-  //       top: false,
-  //       right: false,
-  //       bottom: false,
-  //       left: true,
-  //       topRight: false,
-  //       bottomRight: false,
-  //       bottomLeft: false,
-  //       topLeft: false,
-  //     }}
-  //   >
-  //     <Cell sx={{ width }} isLastCell={isLastCell}>
-  //       {children}
-  //     </Cell>
-  //   </Resizable>
-  // );
-};
+import { Fragment, useContext, useRef, useState } from 'react';
+import Column from '@/pages/table/Column';
+import { SheetContext } from '@/pages/table/SheetProvider';
 
 // 新增按钮
 const AddColumnButton = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [showMenu, setShowMenu] = useState(false);
+  const { addColumn } = useContext(SheetContext);
 
   const handlerAddClick = () => {
     setShowMenu(true);
@@ -71,6 +22,7 @@ const AddColumnButton = () => {
 
   const handlerItemClick = () => {
     setShowMenu(false);
+    addColumn?.();
   };
 
   return (
@@ -93,41 +45,40 @@ const AddColumnButton = () => {
 };
 
 const HRow = styled('div')(() => ({
-  display: 'inline-flex',
+  display: 'flex',
   flexDirection: 'row',
-  borderBottom: `1px solid ${grey[300]}`,
+  borderTop: `1px solid ${grey[300]}`,
 }));
 
-interface HeaderProps {
-  columns: { key: string; width: number; title: string }[];
-}
+interface HeaderProps {}
 
-const Header: FC<HeaderProps> = ({ columns }) => {
-  const [_columns, setColumns] = useState(columns);
+const Header: FC<HeaderProps> = () => {
+  const { columns } = useContext(SheetContext);
+  // const [_columns, setColumns] = useState(context.columns);
 
   // 列宽度发生变化
   const onColumnWidthChange = (key: string, width: number) => {
-    const columnIndex = _columns.findIndex((col) => col.key === key);
+    const columnIndex = columns.findIndex((col) => col.key === key);
     if (columnIndex > -1) {
-      _columns[columnIndex].width = width;
-      setColumns([..._columns]);
+      columns[columnIndex].width = width;
+      // setColumns([...columns]);
     }
   };
 
   return (
     <HRow>
-      {_columns.map((column) => (
-        <HCell
+      {columns.map((column) => (
+        <Column
           key={column.key}
           width={column.width}
           onWidthChange={(val) => onColumnWidthChange(column.key, val)}
         >
           {column.title}
-        </HCell>
+        </Column>
       ))}
-      <HCell key={'__create'} width={100} isLastCell>
+      <Column key={'__create'} width={100} isLastCell>
         <AddColumnButton />
-      </HCell>
+      </Column>
     </HRow>
   );
 };
