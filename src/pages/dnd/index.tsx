@@ -1,39 +1,41 @@
+import { useState } from 'react';
+import { Box, Container } from '@mui/material';
 import { DndContext } from '@dnd-kit/core';
-import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { SortableContext } from '@dnd-kit/sortable';
+import Group from '@/pages/dnd/Group';
 
-// 容器组件
-export default function SingleTest() {
-  const items = ['A', 'B', 'C'];
-
-  const onDragEnd = (e: any) => {
-    console.log(e);
-  };
-
-  return (
-    <DndContext onDragEnd={onDragEnd}>
-      <SortableContext items={items}>
-        {items.map((val) => (
-          <Item id={val} key={val} />
-        ))}
-      </SortableContext>
-    </DndContext>
-  );
-}
-
-// 拖拽项组件
-function Item(props: any) {
-  const { id } = props;
-  const { setNodeRef, listeners, transform, transition } = useSortable({ id });
-  const styles = {
-    transform: CSS.Transform.toString(transform),
-    border: '1px solid red',
-    marginTop: '10px',
-  };
+const initialItems = [
+  {
+    label: '分组一',
+    key: 'group_1',
+    children: [
+      { label: '项目一', key: 'item_1' },
+      { label: '项目二', key: 'item_2' },
+      { label: '项目三', key: 'item_3' },
+    ],
+  },
+  {
+    label: '分组二',
+    key: 'group_2',
+    children: [
+      { label: '项目三', key: 'item_3' },
+      { label: '项目四', key: 'item_4' },
+      { label: '项目五', key: 'item_5' },
+    ],
+  },
+];
+export default () => {
+  const [items, setItems] = useState(initialItems);
 
   return (
-    <div ref={setNodeRef} {...listeners} style={styles}>
-      {id}
-    </div>
+    <Container>
+      <DndContext>
+        <SortableContext items={items.map((i) => i.key)}>
+          {items.map((i) => (
+            <Group key={i.key} label={i.label} id={i.key} items={i.children} />
+          ))}
+        </SortableContext>
+      </DndContext>
+    </Container>
   );
-}
+};

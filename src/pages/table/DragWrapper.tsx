@@ -24,6 +24,7 @@ const DragWrapper: RFC<{ id: string }> = ({ children, id }) => {
         borderTop: isDragging ? `1px solid ${grey[200]}` : 'none',
         transition,
         zIndex: isDragging ? 10 : 1,
+        opacity: isDragging ? 0.3 : 1,
       }}
       {...listeners}
       {...attributes}
