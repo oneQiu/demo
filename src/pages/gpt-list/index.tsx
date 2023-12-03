@@ -207,11 +207,14 @@ function App() {
     }
   };
 
+  const findContainer = (id: string | number) =>
+    groups.find((i) => i.id === id);
+
   const onDragOver = (event: DragOverEvent) => {
     console.log('onDragOver', event);
-    const { active, over, draggingRect } = event;
+    const { active, over, activatorEvent: draggingRect } = event;
     const { id } = active;
-    const { id: overId } = over;
+    const { id: overId } = over!;
 
     // Find the containers
     const activeContainer = findContainer(id);
@@ -220,18 +223,17 @@ function App() {
     if (
       !activeContainer ||
       !overContainer ||
-      activeContainer === overContainer
+      activeContainer.id === overContainer.id
     ) {
       return;
     }
 
-    setItems((prev) => {
-      const activeItems = prev[activeContainer];
-      const overItems = prev[overContainer];
-
-      // Find the indexes for the items
-      const activeIndex = activeItems.indexOf(id);
-      const overIndex = overItems.indexOf(overId);
+    setGroups((prev) => {
+      const activeItems = prev[activeContainer.id].items;
+      const overItems = prev[overContainer.id].items;
+      // 找到行元素
+      const activeIndex = activeItems.findIndex((i) => i.id === activeId);
+      const overIndex = overItems.findIndex((i) => i.id === overId);
 
       let newIndex;
       if (overId in prev) {
